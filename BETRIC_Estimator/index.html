@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BETRIC Smart Estimator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            800: '#1e3a8a', // Navy accent
+                            900: '#0f172a', // Deep Navy background
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981', // Elegant Green
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-navy-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-navy-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-navy-900">B</div>
+                <h1 class="text-xl font-bold tracking-wider">BETRIC <span class="text-emerald-500 font-light">Estimator</span></h1>
+            </div>
+            <div class="space-x-4 hidden md:block">
+                <a href="#calculator" class="hover:text-emerald-400 transition">Kalkulator</a>
+                <a href="#gallery" class="hover:text-emerald-400 transition">Galeri Proyek</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
+        
+        <!-- Header Section -->
+        <div class="text-center mb-12 fade-in">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-navy-900 mb-4">Estimasi Harga Sistem Keamanan Anda</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Hitung perkiraan biaya instalasi CCTV dengan transparan. Pilih spesifikasi yang sesuai dengan kebutuhan dan budget Anda.</p>
+            
+            <!-- Kategori Tabs -->
+            <div class="flex justify-center space-x-2 mt-6">
+                <button class="bg-navy-900 text-white px-6 py-2 rounded-full font-medium shadow-md">CCTV</button>
+                <button class="bg-gray-200 text-gray-500 px-6 py-2 rounded-full font-medium cursor-not-allowed" title="Segera Hadir">Solar Cell (Coming Soon)</button>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="text-center py-10 text-emerald-600 font-bold animate-pulse">
+            Menyiapkan sistem BETRIC...
+        </div>
+
+        <!-- App Container (Hidden until loaded) -->
+        <div id="appContainer" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Form Options -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- 1. Resolusi (MP) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in">
+                    <h3 class="text-xl font-bold text-navy-900 mb-1">1. Resolusi Kamera (Megapixel)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Semakin besar MP, gambar semakin tajam saat di-zoom. Resolusi 2MP adalah standar masa kini.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="mpOptions">
+                        <!-- Dimuat via JS -->
+                    </div>
+                </div>
+
+                <!-- 2. Tipe Sistem -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in" style="animation-delay: 0.1s;">
+                    <h3 class="text-xl font-bold text-navy-900 mb-1">2. Tipe Sistem CCTV</h3>
+                    <p class="text-sm text-gray-500 mb-4">Pilih teknologi yang sesuai dengan struktur bangunan Anda.</p>
+                    <div class="space-y-3" id="typeOptions">
+                        <!-- Dimuat via JS -->
+                    </div>
+                </div>
+
+                <!-- 3. Penyimpanan -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in" style="animation-delay: 0.2s;">
+                    <h3 class="text-xl font-bold text-navy-900 mb-1">3. Media Penyimpanan</h3>
+                    <p class="text-sm text-gray-500 mb-4">Tempat menyimpan rekaman. Hardisk cocok untuk banyak kamera, Memory Card untuk kamera satuan.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="storageOptions">
+                        <!-- Dimuat via JS -->
+                    </div>
+                </div>
+
+                <!-- 4. Jumlah Kamera -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in" style="animation-delay: 0.3s;">
+                    <h3 class="text-xl font-bold text-navy-900 mb-1">4. Jumlah Kamera</h3>
+                    <p class="text-sm text-gray-500 mb-4">Indoor (bentuk setengah bola untuk dalam ruangan), Outdoor (bentuk memanjang tahan cuaca).</p>
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <div class="flex-1 flex items-center justify-between bg-gray-50 p-4 rounded-xl">
+                            <div>
+                                <span class="font-bold text-gray-800 block">Indoor</span>
+                                <span class="text-xs text-gray-500">Kamera Dalam Ruangan</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="updateQty('indoor', -1)" class="w-8 h-8 rounded-full bg-white border shadow flex items-center justify-center font-bold text-navy-800 hover:bg-gray-100">-</button>
+                                <span id="indoorQty" class="font-bold text-lg w-4 text-center">0</span>
+                                <button onclick="updateQty('indoor', 1)" class="w-8 h-8 rounded-full bg-emerald-500 shadow flex items-center justify-center font-bold text-white hover:bg-emerald-600">+</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex items-center justify-between bg-gray-50 p-4 rounded-xl">
+                            <div>
+                                <span class="font-bold text-gray-800 block">Outdoor</span>
+                                <span class="text-xs text-gray-500">Kamera Luar Ruangan</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="updateQty('outdoor', -1)" class="w-8 h-8 rounded-full bg-white border shadow flex items-center justify-center font-bold text-navy-800 hover:bg-gray-100">-</button>
+                                <span id="outdoorQty" class="font-bold text-lg w-4 text-center">0</span>
+                                <button onclick="updateQty('outdoor', 1)" class="w-8 h-8 rounded-full bg-emerald-500 shadow flex items-center justify-center font-bold text-white hover:bg-emerald-600">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Merk -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in" style="animation-delay: 0.4s;">
+                    <h3 class="text-xl font-bold text-navy-900 mb-1">5. Merk Perangkat</h3>
+                    <p class="text-sm text-gray-500 mb-4">Pilih brand sesuai preferensi Anda.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="brandOptions">
+                         <!-- Dimuat via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Summary & Price -->
+            <div class="lg:col-span-1">
+                <div class="bg-navy-900 text-white p-6 rounded-2xl shadow-xl sticky top-24 fade-in">
+                    <h3 class="text-xl font-bold mb-4 flex items-center border-b border-navy-800 pb-3">
+                        <svg class="w-6 h-6 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        Estimasi Biaya
+                    </h3>
+                    
+                    <div class="space-y-3 text-sm mb-6" id="summaryList">
+                        <!-- Ringkasan Item dimuat di sini -->
+                    </div>
+
+                    <div class="border-t border-navy-800 pt-4 mb-6">
+                        <p class="text-gray-400 text-xs mb-1">Estimasi Total Keseluruhan</p>
+                        <p class="text-3xl font-extrabold text-emerald-400" id="totalPrice">Rp 0</p>
+                        <p class="text-xs text-gray-400 mt-2">*Harga ini adalah estimasi. Harga final dapat menyesuaikan kondisi lapangan (panjang kabel, tingkat kesulitan, dll).</p>
+                    </div>
+
+                    <button onclick="contactWhatsApp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl transition-colors flex justify-center items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Pesan via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <div id="gallery" class="mt-20 fade-in hidden">
+            <h2 class="text-3xl font-bold text-navy-900 mb-2 text-center">Galeri Proyek & Produk</h2>
+            <p class="text-gray-500 text-center mb-8">Hasil instalasi profesional dari tim BETRIC.</p>
+            
+            <div id="galleryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Foto dimuat via JS -->
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL (Hidden by Default) -->
+        <div id="adminPanel" class="mt-20 bg-gray-800 p-6 rounded-2xl shadow-xl text-white hidden">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                <h2 class="text-2xl font-bold text-emerald-400">Panel Admin BETRIC</h2>
+                <button onclick="closeAdmin()" class="text-gray-400 hover:text-white">Tutup Admin</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Form Update Harga -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Pengaturan Harga Dasar (Rp)</h3>
+                    <div id="adminPricesContainer" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        <!-- Inputs generated by JS -->
+                    </div>
+                    <button onclick="savePrices()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded font-bold transition">Simpan Harga</button>
+                </div>
+
+                <!-- Form Upload Galeri (Simulated with URL) -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Tambah Foto Galeri</h3>
+                    <p class="text-sm text-gray-400 mb-3">Masukkan Link (URL) gambar untuk ditampilkan di galeri pelanggan.</p>
+                    <input type="text" id="newImgUrl" placeholder="https://contoh.com/gambar-cctv.jpg" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white mb-3">
+                    <button onclick="addImage()" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded font-bold transition mb-6">Tambah Foto</button>
+
+                    <h4 class="font-bold mb-2">Foto Saat Ini:</h4>
+                    <ul id="adminGalleryList" class="space-y-2 max-h-48 overflow-y-auto">
+                        <!-- List images -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy-900 text-gray-400 text-center py-6 mt-12 text-sm relative">
+        <p>&copy; 2026 BETRIC Security Systems. All rights reserved.</p>
+        <!-- Secret Admin Trigger -->
+        <button onclick="openAdminPrompt()" class="absolute bottom-6 right-6 opacity-20 hover:opacity-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </button>
+    </footer>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Database Firebase (Otomatis dari lingkungan)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'betric-app';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Data Default ---
+        let configData = {
+            mp: [
+                { id: '2mp', label: '2 MP', price: 0, desc: 'Standar Jelas' },
+                { id: '4mp', label: '4 MP', price: 150000, desc: 'Sangat Jelas' },
+                { id: '5mp', label: '5 MP', price: 250000, desc: 'Ultra Jelas (Bisa Zoom Jauh)' }
+            ],
+            type: [
+                { id: 'analog', label: 'Analog / HD-TVI', basePrice: 250000, desc: 'Harga lebih terjangkau, menggunakan kabel coaxial. Cocok untuk sistem standar.' },
+                { id: 'ip', label: 'IP Camera', basePrice: 450000, desc: 'Kualitas gambar digital lebih baik, via kabel LAN/UTP. Cocok untuk sistem modern.' },
+                { id: 'wireless', label: 'Wireless (WiFi)', basePrice: 550000, desc: 'Tanpa kabel video (hanya butuh listrik). Sangat praktis untuk area sulit ditarik kabel.' }
+            ],
+            storage: [
+                { id: 'sdcard', label: 'Memory Card (64GB - 128GB)', price: 150000, desc: 'Menyimpan rekaman beberapa hari. Cocok untuk kamera Wireless satuan.' },
+                { id: 'hdd1tb', label: 'Hardisk 1TB (Khusus Analog/IP)', price: 750000, desc: 'Kapasitas besar untuk berminggu-minggu. Wajib untuk sistem multi-kamera.' }
+            ],
+            brand: [
+                { id: 'hikvision', label: 'Hikvision', price: 0, desc: 'Brand No.1 Global' },
+                { id: 'dahua', label: 'Dahua', price: -20000, desc: 'Berkualitas & Ekonomis' },
+                { id: 'ezviz', label: 'Ezviz (Khusus Wireless)', price: 50000, desc: 'Terbaik untuk Smart Home' }
+            ],
+            other: {
+                installFeePerCam: 150000,
+                dvr4ch: 800000,
+                dvr8ch: 1200000,
+            }
+        };
+
+        let galleryData = {
+            images: [
+                "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=400",
+                "https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?auto=format&fit=crop&q=80&w=400",
+                "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=400",
+                "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&q=80&w=400"
+            ]
+        };
+
+        // --- State Pilihan Pengguna ---
+        let selections = {
+            mp: '2mp',
+            type: 'analog',
+            storage: 'hdd1tb',
+            brand: 'hikvision',
+            indoor: 2,
+            outdoor: 2
+        };
+
+        // --- Inisialisasi Auth & Data ---
+        const init = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                fetchData();
+            } catch (error) {
+                console.error("Gagal terhubung:", error);
+                document.getElementById('loadingIndicator').innerText = "Versi Offline Berjalan (Gagal muat database).";
+                renderApp(); // Fallback ke data default
+            }
+        };
+
+        const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'betric_config', 'main');
+
+        const fetchData = () => {
+            onSnapshot(configRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.configData) configData = data.configData;
+                    if(data.galleryData) galleryData = data.galleryData;
+                } else {
+                    // Simpan data default pertama kali
+                    setDoc(configRef, { configData, galleryData });
+                }
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('gallery').classList.remove('hidden');
+                renderApp();
+                renderGallery();
+                if(document.getElementById('adminPanel').classList.contains('hidden') === false) {
+                    renderAdminPrices();
+                    renderAdminGallery();
+                }
+            }, (error) => {
+                console.error("Error mengambil data", error);
+                renderApp(); // Tetap render meski error pake default
+            });
+        };
+
+        // --- Logika Render UI Pelanggan ---
+        const formatRupiah = (angka) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka);
+        };
+
+        window.updateSelection = (category, value) => {
+            selections[category] = value;
+            
+            // Logika Bisnis Khusus
+            if(category === 'type' && value === 'wireless') {
+                selections.brand = 'ezviz'; // Auto pilih Ezviz
+                selections.storage = 'sdcard'; // Auto pilih SD card
+            }
+            if(category === 'type' && (value === 'analog' || value === 'ip')) {
+                if(selections.brand === 'ezviz') selections.brand = 'hikvision';
+                if(selections.storage === 'sdcard') selections.storage = 'hdd1tb';
+            }
+
+            renderApp();
+        };
+
+        window.updateQty = (type, amount) => {
+            let newVal = selections[type] + amount;
+            if (newVal >= 0 && newVal <= 16) { // Max 16 kamera untuk simulasi ini
+                selections[type] = newVal;
+                renderApp();
+            }
+        };
+
+        const renderApp = () => {
+            // Render MP
+            document.getElementById('mpOptions').innerHTML = configData.mp.map(item => `
+                <label class="cursor-pointer">
+                    <input type="radio" name="mp" class="peer sr-only" ${selections.mp === item.id ? 'checked' : ''} onchange="updateSelection('mp', '${item.id}')">
+                    <div class="p-4 rounded-xl border-2 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 hover:bg-gray-50 transition">
+                        <div class="font-bold text-navy-900">${item.label}</div>
+                        <div class="text-xs text-gray-500 mt-1">${item.desc}</div>
+                    </div>
+                </label>
+            `).join('');
+
+            // Render Type
+            document.getElementById('typeOptions').innerHTML = configData.type.map(item => `
+                <label class="cursor-pointer block">
+                    <input type="radio" name="type" class="peer sr-only" ${selections.type === item.id ? 'checked' : ''} onchange="updateSelection('type', '${item.id}')">
+                    <div class="p-4 rounded-xl border-2 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 hover:bg-gray-50 transition flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-navy-900">${item.label}</div>
+                            <div class="text-sm text-gray-500 mt-1">${item.desc}</div>
+                        </div>
+                        <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 flex items-center justify-center"></div>
+                    </div>
+                </label>
+            `).join('');
+
+            // Render Storage
+            const isWireless = selections.type === 'wireless';
+            document.getElementById('storageOptions').innerHTML = configData.storage.map(item => {
+                const disabled = (isWireless && item.id === 'hdd1tb') || (!isWireless && item.id === 'sdcard');
+                return `
+                <label class="cursor-pointer ${disabled ? 'opacity-40' : ''}">
+                    <input type="radio" name="storage" class="peer sr-only" ${selections.storage === item.id ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="updateSelection('storage', '${item.id}')">
+                    <div class="p-4 rounded-xl border-2 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 ${disabled ? 'bg-gray-100' : 'hover:bg-gray-50'} transition h-full">
+                        <div class="font-bold text-navy-900">${item.label}</div>
+                        <div class="text-xs text-gray-500 mt-1">${item.desc}</div>
+                    </div>
+                </label>
+            `}).join('');
+
+            // Render Qty
+            document.getElementById('indoorQty').innerText = selections.indoor;
+            document.getElementById('outdoorQty').innerText = selections.outdoor;
+
+            // Render Brand
+            document.getElementById('brandOptions').innerHTML = configData.brand.map(item => {
+                const disabled = (isWireless && item.id !== 'ezviz') || (!isWireless && item.id === 'ezviz');
+                return `
+                <label class="cursor-pointer ${disabled ? 'opacity-40' : ''}">
+                    <input type="radio" name="brand" class="peer sr-only" ${selections.brand === item.id ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="updateSelection('brand', '${item.id}')">
+                    <div class="p-3 text-center rounded-xl border-2 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 ${disabled ? 'bg-gray-100' : 'hover:bg-gray-50'} transition">
+                        <div class="font-bold text-navy-900">${item.label}</div>
+                        <div class="text-[10px] text-gray-500 leading-tight mt-1">${item.desc}</div>
+                    </div>
+                </label>
+            `}).join('');
+
+            calculatePrice();
+        };
+
+        const renderGallery = () => {
+            const container = document.getElementById('galleryContainer');
+            if(galleryData.images.length === 0) {
+                container.innerHTML = '<p class="col-span-full text-center text-gray-400">Belum ada foto.</p>';
+                return;
+            }
+            container.innerHTML = galleryData.images.map(url => `
+                <div class="aspect-video bg-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+                    <img src="${url}" alt="Proyek BETRIC" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300?text=Image+Error'">
+                </div>
+            `).join('');
+        };
+
+        const calculatePrice = () => {
+            const totalCam = selections.indoor + selections.outdoor;
+            
+            // Get Prices
+            const mpObj = configData.mp.find(i => i.id === selections.mp);
+            const typeObj = configData.type.find(i => i.id === selections.type);
+            const storageObj = configData.storage.find(i => i.id === selections.storage);
+            const brandObj = configData.brand.find(i => i.id === selections.brand);
+
+            let pricePerCam = typeObj.basePrice + mpObj.price + brandObj.price;
+            let totalCameraPrice = pricePerCam * totalCam;
+            
+            // Storage
+            let storagePrice = selections.type === 'wireless' ? (storageObj.price * totalCam) : storageObj.price;
+
+            // DVR/NVR (Pusat)
+            let centerPrice = 0;
+            let centerLabel = '';
+            if (selections.type !== 'wireless' && totalCam > 0) {
+                if (totalCam <= 4) { centerPrice = configData.other.dvr4ch; centerLabel = 'DVR/NVR 4 Channel'; }
+                else if (totalCam <= 8) { centerPrice = configData.other.dvr8ch; centerLabel = 'DVR/NVR 8 Channel'; }
+                else { centerPrice = configData.other.dvr8ch * 2; centerLabel = 'DVR/NVR 16 Channel'; }
+            }
+
+            // Instalasi
+            let installPrice = configData.other.installFeePerCam * totalCam;
+
+            const grandTotal = totalCameraPrice + storagePrice + centerPrice + installPrice;
+
+            // Render Summary HTML
+            let summaryHtml = '';
+            if (totalCam === 0) {
+                summaryHtml = '<p class="text-gray-400 italic">Silakan tentukan jumlah kamera.</p>';
+            } else {
+                summaryHtml += `<div class="flex justify-between"><span>${totalCam}x Kamera ${mpObj.label} (${brandObj.label})</span><span>${formatRupiah(totalCameraPrice)}</span></div>`;
+                if(centerPrice > 0) summaryHtml += `<div class="flex justify-between text-gray-400"><span>1x ${centerLabel}</span><span>${formatRupiah(centerPrice)}</span></div>`;
+                summaryHtml += `<div class="flex justify-between text-gray-400"><span>Penyimpanan (${storageObj.label})</span><span>${formatRupiah(storagePrice)}</span></div>`;
+                summaryHtml += `<div class="flex justify-between text-gray-400"><span>Jasa Instalasi & Setting</span><span>${formatRupiah(installPrice)}</span></div>`;
+            }
+
+            document.getElementById('summaryList').innerHTML = summaryHtml;
+            document.getElementById('totalPrice').innerText = totalCam > 0 ? formatRupiah(grandTotal) : 'Rp 0';
+        };
+
+        window.contactWhatsApp = () => {
+            const totalCam = selections.indoor + selections.outdoor;
+            if(totalCam === 0) return alert("Pilih jumlah kamera terlebih dahulu.");
+            
+            const text = `Halo BETRIC Security,\nSaya ingin memasang CCTV dengan spesifikasi:\n- Kamera: ${totalCam} Titik (${selections.indoor} In / ${selections.outdoor} Out)\n- Resolusi: ${selections.mp}\n- Tipe: ${selections.type}\n- Merk: ${selections.brand}\n- Estimasi di Web: ${document.getElementById('totalPrice').innerText}\n\nMohon info lebih lanjut. Terima kasih.`;
+            const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`; // Ganti Nomor WA Anda disini
+            window.open(waUrl, '_blank');
+        };
+
+        // --- Logika Admin ---
+        window.openAdminPrompt = () => {
+            const pin = prompt("Masukkan PIN Admin (Demo PIN: admin123):");
+            if (pin === "admin123") {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+                renderAdminPrices();
+                renderAdminGallery();
+            } else if(pin !== null) {
+                alert("PIN Salah!");
+            }
+        };
+
+        window.closeAdmin = () => {
+            document.getElementById('adminPanel').classList.add('hidden');
+        };
+
+        const renderAdminPrices = () => {
+            let html = '';
+            const createInput = (label, objPath, value) => `
+                <div class="flex justify-between items-center bg-gray-700 p-2 rounded">
+                    <span class="text-sm w-1/2">${label}</span>
+                    <input type="number" data-path="${objPath}" value="${value}" class="admin-price-input w-1/2 p-1 rounded bg-gray-900 text-white border border-gray-600">
+                </div>
+            `;
+            
+            html += `<h4 class="text-xs text-emerald-400 mt-2 font-bold uppercase">Base Harga Tipe</h4>`;
+            configData.type.forEach((t, i) => html += createInput(t.label, `type,${i},basePrice`, t.basePrice));
+            
+            html += `<h4 class="text-xs text-emerald-400 mt-4 font-bold uppercase">Tambahan Harga MP</h4>`;
+            configData.mp.forEach((m, i) => html += createInput(m.label, `mp,${i},price`, m.price));
+
+            html += `<h4 class="text-xs text-emerald-400 mt-4 font-bold uppercase">Tambahan Harga Merk</h4>`;
+            configData.brand.forEach((b, i) => html += createInput(b.label, `brand,${i},price`, b.price));
+
+            html += `<h4 class="text-xs text-emerald-400 mt-4 font-bold uppercase">Lain-lain</h4>`;
+            html += createInput("Jasa Pasang /Titik", "other,installFeePerCam,null", configData.other.installFeePerCam);
+            html += createInput("Harga DVR 4CH", "other,dvr4ch,null", configData.other.dvr4ch);
+            html += createInput("Harga DVR 8CH", "other,dvr8ch,null", configData.other.dvr8ch);
+
+            document.getElementById('adminPricesContainer').innerHTML = html;
+        };
+
+        window.savePrices = async () => {
+            if(!auth.currentUser) return alert("Belum terkoneksi ke database!");
+            
+            const inputs = document.querySelectorAll('.admin-price-input');
+            let newConfig = JSON.parse(JSON.stringify(configData)); // Clone
+
+            inputs.forEach(input => {
+                const parts = input.dataset.path.split(',');
+                const val = parseInt(input.value) || 0;
+                
+                if(parts[0] === 'other') {
+                    newConfig.other[parts[1]] = val;
+                } else {
+                    newConfig[parts[0]][parseInt(parts[1])][parts[2]] = val;
+                }
+            });
+
+            try {
+                await updateDoc(configRef, { configData: newConfig });
+                alert("Harga berhasil diupdate!");
+            } catch (error) {
+                console.error(error);
+                alert("Gagal menyimpan harga.");
+            }
+        };
+
+        window.addImage = async () => {
+            const urlInput = document.getElementById('newImgUrl');
+            const url = urlInput.value.trim();
+            if(!url) return;
+
+            let newGallery = { images: [...galleryData.images, url] };
+
+            try {
+                await updateDoc(configRef, { galleryData: newGallery });
+                urlInput.value = '';
+            } catch (error) {
+                console.error(error);
+                alert("Gagal menambah foto.");
+            }
+        };
+
+        window.removeImage = async (index) => {
+            if(!confirm("Hapus foto ini?")) return;
+            let newImages = [...galleryData.images];
+            newImages.splice(index, 1);
+            
+            try {
+                await updateDoc(configRef, { galleryData: { images: newImages } });
+            } catch(e) { console.error(e); }
+        };
+
+        const renderAdminGallery = () => {
+            const list = document.getElementById('adminGalleryList');
+            list.innerHTML = galleryData.images.map((url, i) => `
+                <li class="flex justify-between items-center bg-gray-700 p-2 rounded text-sm">
+                    <span class="truncate w-3/4">${url}</span>
+                    <button onclick="removeImage(${i})" class="text-red-400 hover:text-red-300 font-bold">Hapus</button>
+                </li>
+            `).join('');
+        };
+
+        // Start!
+        init();
+
+    </script>
+</body>
+</html>
